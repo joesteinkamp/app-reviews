@@ -18,21 +18,26 @@ class App extends Component {
 	}
 
 	handleSubmit(i) {
+		if(this.state.inputURL !== '') {
+			// Use callback function since if its a short URL it needs an async call to extract
+			extractIosID(this.state.inputURL, (id) => {
+				if(id !== 0) {
+					this.setState({validURL: true});
 
-		// Use callback function since if its a short URL it needs an async call to extract
-		extractIosID(this.state.inputURL, (id) => {
-			if(id !== 0) {
-				this.setState({validURL: true});
-
-				getIosReviews(id, (entries) => {
-					// Update state with data
-					this.setState({reviewsLoaded: true, data: entries});
-				});
-			}
-			else {
-				this.setState({validURL: false});
-			}
-		});
+					getIosReviews(id, (entries) => {
+						// Update state with data
+						this.setState({reviewsLoaded: true, data: entries});
+					});
+				}
+				else {
+					// Invalid URL
+					this.setState({validURL: false});
+				}
+			});
+		}
+		else {
+			// No text in URL input field
+		}
 	}
 
 	handleOnClickRecent(i) {
@@ -81,7 +86,7 @@ class URLForm extends Component {
 		return (
 			<div className="urlForm">
 				<label htmlFor="appstore-url">
-					Enter the App Store link of your desired app:
+					Paste the App Store link of your desired app:
 					<input 
 						id="appstore-url"
 						type="url"
@@ -100,13 +105,10 @@ class URLForm extends Component {
 
 class Recents extends Component {
 	render() {
-		/* Pull from Local DB */
-		if ( localStorage.length === 0 ) {
-			// Do nothing
-		}
-		else {
-			var recents = [];
-			
+		var recents = [];
+		
+		// Pull from Local DB
+		if ( localStorage.length !== 0 ) {
 			for(var i = 0; i < localStorage.length; i++) {
 				var key = localStorage.key(i);
 
@@ -121,8 +123,15 @@ class Recents extends Component {
 			}
 		}
 
+		// Control if Recents should display or not
+		var showRecents = false;
+		if (recents.length == 0) {
+			showRecents = true;
+		}
+
 		return (
-			<div className="">
+			<div className={showRecents ? 'hidden' : 'recentsContainer'}>
+				<h1 className="subheader">Recents</h1>
 				<ul>
 					{recents}
 				</ul>
@@ -133,7 +142,7 @@ class Recents extends Component {
 
 function RecentItem(props) {
 	return (
-		<li onClick={(i) => props.onClick(props.id)}>{props.name}</li>
+		<li className="recentItem" onClick={(i) => props.onClick(props.id)}>{props.name}</li>
 	);
 }
 
@@ -149,7 +158,7 @@ class ReviewsPage extends Component {
 		var reviewsData = this.state.data;
 
 		return (
-			<div className="reviewsPage">
+			<div className="Reviews">
 				<AppInfo data={reviewsData} />
 				<Reviews data={reviewsData} />
 			</div>
@@ -196,24 +205,60 @@ class Reviews extends Component {
 		});
 
 		return (
-			<div className="reviews">
+			<div className="reviewsContainer">
 				{/*<input type="search" />*/}
+				<h1 className="subheader">{reviews.length} Reviews</h1>
 				{reviews}
 			</div>
 		);
 	}
 }
 
-function ReviewCard(props) {
-	return (
-		<div className="reviewCard" onClick="">
-			<div className="starRating">{props.reviewRating}</div>
-			<div className="userName">{props.reviewUser}</div>
-			<div className="reviewDesc">
-				{props.reviewDesc}
+// function ReviewCard(props) {
+// 	return (
+// 		<div className="reviewCard" onClick="">
+// 			<div className={"material-icons starRating"+props.reviewRating}></div>
+// 			<p className="userName">{props.reviewUser}</p>
+// 			<h1 className="title">{props.reviewTitle}</h1>
+// 			<div className="reviewDesc">
+// 				{props.reviewDesc}
+// 			</div>
+// 		</div>
+// 	);
+// }
+
+class ReviewCard extends Component {
+	render() {
+		var starRatingText;
+		switch(this.props.reviewRating) {
+			case "1":
+				starRatingText = "star"
+				break;
+			case "2":
+				starRatingText = "star star"
+				break;
+			case "3": 
+				starRatingText = "star star star"
+				break;
+			case "4":
+				starRatingText = "star star star star"
+				break;
+			case "5":
+				starRatingText = "star star star star star"
+				break;
+		}
+
+		return (
+			<div className="reviewCard" onClick="">
+				<div className={"material-icons starRating starRating"+this.props.reviewRating}>{starRatingText}</div>
+				<p className="userName">{this.props.reviewUser}</p>
+				<h1 className="title">{this.props.reviewTitle}</h1>
+				<div className="reviewDesc">
+					{this.props.reviewDesc}
+				</div>
 			</div>
-		</div>
-	);
+		);
+	}
 }
 
 // function ReviewDetails(props) {

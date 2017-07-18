@@ -1,24 +1,195 @@
+
+/* Material Icon Font */ 
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v22/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2) format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+
+
+
+
 .App {
-  text-align: center;
+    margin: auto;
+    max-width: 720px;
+    font: 16px/18px "Helvetica Neue", Roboto, sans-serif;
+    color: #2B2B2B;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.subheader {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 18px;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.hidden {
+    display: none;
 }
 
-.App-intro {
-  font-size: large;
+
+
+
+.Home {
+    max-width: 450px;
+    margin: 100px auto 0;
+    padding: 0 15px;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    .urlForm {
+        text-align: center;
+    } 
+
+        .urlForm label {
+            display: block;
+            font-size: 28px;
+            line-height: 33px;
+        }
+
+        .urlForm input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 25px 0 0;
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            font-size: 24px;
+            line-height: 28px;
+            box-sizing: border-box;
+        }
+
+        .urlForm button {
+            width: 100%;
+            font-size: 24px;
+            line-height: 30px;
+            color: #fff;
+            background-color: #4A90E2;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 0;
+            border-radius: 2px;
+        }
+    
+    .recentsContainer {
+        margin-top: 50px;
+    }
+
+        .recentsContainer ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recentItem {
+            box-sizing: border-box;
+            background-color: #EFEFF4;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #979797;
+            border-radius: 2px;
+        }
+
+
+
+
+.Reviews {
+    margin: 20px 15px;
 }
+
+    .appInfo {
+        margin-bottom: 20px;   
+        min-height: 100px; 
+    }
+
+        .appInfo img {
+            width: 100px;
+            height: 100px;
+            float: left;
+            margin-right: 10px;
+            border-radius: 20px;
+        }
+
+        .appInfo h1 {
+            margin: 0;
+            font-size: 20px;
+            line-height: 24px;
+            font-weight: normal;
+        }
+
+        .appInfo p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 22px;
+        }
+
+    .reviewsContainer {
+        clear: both;
+    }
+
+        .reviewCard {
+            margin: 15px 0;
+            padding: 15px;
+            display: block;
+            box-sizing: border-box;
+            background-color: #fff;
+            border: 0;
+            border-radius: 2px;
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .24), 0 0 2px 0 rgba(0, 0, 0, .12);
+        }
+
+            .starRating {
+                float: left;
+                margin-bottom: 15px;
+                letter-spacing: -5px;
+                color: #F5A623;
+            }
+            .starRating1 {
+
+            }
+            .starRating2 {
+
+            }
+            .starRating3 {
+
+            }
+            .starRating4 {
+
+            }
+            .starRating5 {
+
+            }
+
+            .userName {
+                float: right;
+                margin: 0 0 15px;
+                font-size: 18px;
+                line-height: 24px;
+                color: #9B9B9B;
+            }
+
+            .title {
+                clear: both;
+                margin: 0 0 5px;
+                font-size: 16px;
+                font-weight: bold;
+            }
