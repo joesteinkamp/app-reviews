@@ -4,8 +4,12 @@
 - Lookup reviews based on app store URL, either copied from share sheet in the App Store or iTunes link
 - Remember recently viewed apps for easy access to revisit
 
+# Roadmap
+
 ## Version 2
 
+- Each app to have unique URL show they can be shared and bookmarked
+- Push URL when viewing app reviews to support the back button
 - Support for Google Play Store URLs
 - Detect when no more reviews are available and stop requests
 - Ability to filter through reviews by keyword search
