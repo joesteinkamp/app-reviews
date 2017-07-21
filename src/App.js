@@ -280,38 +280,52 @@ function extractIosID(url, callback) {
 	// Find url in string
 	var exp = /(\b(((https?|):\/\/)|www[.])[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 	var parsedUrl = url.match(exp);
-	parsedUrl = parsedUrl[0];
 
-	if (parsedUrl.includes("itunes.apple.com")) {
-		var startPosition = url.indexOf('id') + 2;
-		var endPosition = url.indexOf('?');
-		var id = url.substring(startPosition, endPosition);
-
-		callback(id);
-	}
-	else if (parsedUrl.includes("appsto.re")) {
-		const request = require("request");
-
-		request({ 
-			method: "HEAD", 
-			url: parsedUrl, 
-			followAllRedirects: true 
-		}, (error, response, body) => {
-			var longUrl = response.url;
-
-			var startPosition = longUrl.indexOf('id') + 2;
-			var endPosition = longUrl.indexOf('?');
-			var id = longUrl.substring(startPosition, endPosition);
+	if ((typeof parsedUrl !== "undefined" && parsedUrl !== null) ) {
+		parsedUrl = parsedUrl[0];
+		
+		if (parsedUrl.indexOf('itunes.apple.com') !== -1) {
+			var startPosition = url.indexOf('id') + 2;
+			var endPosition = url.indexOf('?');
+			var id = url.substring(startPosition, endPosition);
 
 			callback(id);
-        });
-	}
-	else {
-		console.log("Unknown URL. Error handle");
-		callback(0);
-	}
+		}
+		else if (parsedUrl.indexOf("appsto.re") !== -1) {
 
-	
+			getLongUrl(parsedUrl, (longUrl) => {
+				var startPosition = longUrl.indexOf('id') + 2;
+				var endPosition = longUrl.indexOf('?');
+				var id = longUrl.substring(startPosition, endPosition);
+
+				callback(id);
+			});
+		}
+		else {
+			console.log("Unknown URL. Error handle");
+			callback(0);
+		}	
+	}
+}
+
+function getLongUrl(shortUrl, callback) {
+	const request = require("request");
+	request({ 
+		url: shortUrl,
+		followAllRedirects: true 
+	}, (error, response, body) => {
+		console.log(response);
+
+		callback(response.url);
+	});
+	// var xhttp = new XMLHttpRequest();
+	// xhttp.onreadystatechange = function() {
+	// 	if (this.readyState == 4 && this.status == 200) {
+	// 		callback(xhttp.responseURL);
+	// 	}
+	// }
+	// xhttp.open("GET", shortUrl, true);
+	// xhttp.send();
 }
 
 
