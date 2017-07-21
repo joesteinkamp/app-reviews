@@ -1,6 +1,7 @@
 {
   "name": "app-reviews",
   "version": "0.1.0",
+  "homepage" : "http://jsweb.joesteinkamp.com/app-reviews",
   "private": true,
   "dependencies": {
     "react": "^15.6.1",

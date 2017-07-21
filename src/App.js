@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import './App.css';
 
 class App extends Component {
@@ -89,9 +90,10 @@ class URLForm extends Component {
 					Paste the App Store link of your desired app:
 					<input 
 						id="appstore-url"
-						type="url"
+						type="text"
 						value={inputURL}
 						onChange={(i) => this.props.onChange(i)}
+						onKeyPress={(i) => { if (i.key == 'Enter') { this.props.onClick(i)}}}
 					/>
 				</label>
 				<p className="inlineValidation">{validationMsg}</p>
@@ -309,23 +311,23 @@ function extractIosID(url, callback) {
 }
 
 function getLongUrl(shortUrl, callback) {
-	const request = require("request");
-	request({ 
-		url: shortUrl,
-		followAllRedirects: true 
-	}, (error, response, body) => {
-		console.log(response);
+	// const request = require("request");
+	// request({ 
+	// 	url: shortUrl,
+	// 	followAllRedirects: true 
+	// }, (error, response, body) => {
+	// 	console.log(response);
 
-		callback(response.url);
-	});
-	// var xhttp = new XMLHttpRequest();
-	// xhttp.onreadystatechange = function() {
-	// 	if (this.readyState == 4 && this.status == 200) {
-	// 		callback(xhttp.responseURL);
-	// 	}
-	// }
-	// xhttp.open("GET", shortUrl, true);
-	// xhttp.send();
+	// 	callback(response.url);
+	// });
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			callback(xhttp.responseURL);
+		}
+	}
+	xhttp.open("GET", shortUrl, true);
+	xhttp.send();
 }
 
 

@@ -89,6 +89,9 @@
             border: 0;
             border-radius: 2px;
         }
+            .urlForm button:hover {
+                background-color: #1e65b9;
+            }
     
     .recentsContainer {
         margin-top: 50px;
@@ -108,6 +111,9 @@
             border: 1px solid #979797;
             border-radius: 2px;
         }
+            .recentItem:hover {
+                background: #979797;
+            }
 
 
 
