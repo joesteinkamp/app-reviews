@@ -1,7 +1,7 @@
 {
   "name": "app-reviews",
   "version": "0.1.0",
-  "homepage": "http://jsweb.joesteinkamp.com/app-reviews",
+  "homepage": "http://appreviews.joesteinkamp.com",
   "private": true,
   "dependencies": {
     "express": "^4.15.4",
