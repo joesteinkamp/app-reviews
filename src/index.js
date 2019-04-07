@@ -49,6 +49,7 @@ class App extends Component {
 		}
 		else {
 			// No text in URL input field
+			console.log('No text in URL input field');
 		}
 	}
 
@@ -123,7 +124,7 @@ class URLForm extends Component {
 						type="text"
 						value={inputURL}
 						onChange={(i) => this.props.onChange(i)}
-						onKeyPress={(i) => { if (i.key === 'Enter') { this.props.onClick(i)}}}
+						onKeyPress={(i) => (i.key === 'Enter') ? this.props.onClick(i) : 'Else, do nothing' }
 					/>
 				</label>
 				<p className="inlineValidation">{validationMsg}</p>
@@ -191,7 +192,7 @@ class ReviewsPage extends Component {
 
 		return (
 			<div className="Reviews">
-				<AppInfo data={reviewsData} />
+				{/* <AppInfo data={reviewsData} /> */}
 				<Reviews data={reviewsData} />
 			</div>
 		);
@@ -223,7 +224,7 @@ class Reviews extends Component {
 		const entries = this.props.data;		
 
 		entries.forEach(function(entry, index) {
-			if (index !== 0) {
+			// if (index !== 0) {
 				var reviewID = entry.id;
 				var reviewTitle = entry.title;
 				var reviewRating = entry.rating;
@@ -233,7 +234,7 @@ class Reviews extends Component {
 
 				/* Push entry into array */
 				reviews.push(<ReviewCard key={reviewID} reviewTitle={reviewTitle} reviewRating={reviewRating} reviewUser={reviewUser} reviewDesc={reviewDesc} appVersion={reviewAppVersion} />);
-			}
+			// }
 		});
 
 		return (
@@ -245,19 +246,6 @@ class Reviews extends Component {
 		);
 	}
 }
-
-// function ReviewCard(props) {
-// 	return (
-// 		<div className="reviewCard" onClick="">
-// 			<div className={"material-icons starRating"+props.reviewRating}></div>
-// 			<p className="userName">{props.reviewUser}</p>
-// 			<h1 className="title">{props.reviewTitle}</h1>
-// 			<div className="reviewDesc">
-// 				{props.reviewDesc}
-// 			</div>
-// 		</div>
-// 	);
-// }
 
 class ReviewCard extends Component {
 	render() {
@@ -295,21 +283,6 @@ class ReviewCard extends Component {
 	}
 }
 
-// function ReviewDetails(props) {
-// 	return (
-// 		<div className="reviewDetails">
-// 			<div className="starRating">{/* props.reviewRating */}</div>
-// 			<div className="userName">{/* props.reviewUser */}</div>
-// 			<div className="reviewDesc">
-// 				{/* props.reviewDesc full */}
-// 			</div>
-// 		</div>
-// 	);
-// }
-
-
-
-
 function extractIosID(url, callback) {
 	// Find url in string
 	var exp = /(\b(((https?|):\/\/)|www[.])[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
@@ -320,9 +293,10 @@ function extractIosID(url, callback) {
 		
 		if (parsedUrl.indexOf('itunes.apple.com') !== -1) {
 			var startPosition = url.indexOf('id') + 2;
-			var endPosition = url.indexOf('?');
-			var id = url.substring(startPosition, endPosition);
 
+			var id = url.substring(startPosition);
+
+			console.log(id);
 			callback(id);
 		}
 		else if (parsedUrl.indexOf("appsto.re") !== -1) {
@@ -387,7 +361,7 @@ function getIosReviews(id, callback) {
 				}
 
 				feedEntries.forEach( (entry, index) => {
-					if (index !== 0) {
+					// if (index !== 90000) {
 						var reviewID = entry.id.label;
 						var reviewTitle = entry.title.label;
 						var reviewRating = entry["im:rating"].label;
@@ -406,24 +380,24 @@ function getIosReviews(id, callback) {
 								version: reviewAppVersion
 							}
 						);
-					}
-					else if (index === 0 && pageUrl.includes("page=1/")) {
-						const appIcon = entry["im:image"][2].label.replace("100x100", "512x512");
-						const appName = entry["im:name"].label;
-						const appDev = entry["im:artist"].label;
+					// }
+					// else if (index === 90000 && pageUrl.includes("page=1/")) {
+					// 	const appIcon = entry["im:image"][2].label.replace("100x100", "512x512");
+					// 	const appName = entry["im:name"].label;
+					// 	const appDev = entry["im:artist"].label;
 
-						pageEntries.push(
-							{
-								icon: appIcon,
-								name: appName,
-								dev: appDev,
-							}
-						);
+					// 	pageEntries.push(
+					// 		{
+					// 			icon: appIcon,
+					// 			name: appName,
+					// 			dev: appDev,
+					// 		}
+					// 	);
 
-						// Save into recents
-						var localStrObj = {icon: appIcon, name: appName, dev: appDev};
-						localStorage.setItem(id, JSON.stringify(localStrObj));
-					}
+					// 	// Save into recents
+					// 	var localStrObj = {icon: appIcon, name: appName, dev: appDev};
+					// 	localStorage.setItem(id, JSON.stringify(localStrObj));
+					// }
 				});
 			
 				// Combine array from loop to existing array containing all entries
