@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import {
   BrowserRouter as Router,
   Route,
-  Switch,
-  Link
+  Routes,
+  useParams,
+  useNavigate
 } from 'react-router-dom';
 import './App.css';
 
@@ -18,12 +19,32 @@ class App extends Component {
 			data: '',
 			appID: '',
 			inputURL: '',
-            validURL: false,
-            back: false
+            validURL: false
 		};
-
-        this.historyBackButton = this.historyBackButton.bind(this);
 	}
+
+    componentDidMount() {
+        if (this.props.id) {
+            this.loadReviews(this.props.id);
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.id !== prevProps.id) {
+            if (this.props.id) {
+                this.loadReviews(this.props.id);
+            } else {
+                this.setState({ reviewsLoaded: false, data: '', appID: '', validURL: false });
+            }
+        }
+    }
+
+    loadReviews(id) {
+        getIosReviews(id, (entries) => {
+            // Update state with data
+            this.setState({reviewsLoaded: true, data: entries, appID: id});
+        });
+    }
 
 	handleChange(i) {
 		this.setState({inputURL: i.target.value});
@@ -35,11 +56,7 @@ class App extends Component {
 			extractIosID(this.state.inputURL, (id) => {
 				if(id !== 0) {
 					this.setState({appID: id, validURL: true});
-
-					getIosReviews(id, (entries) => {
-						// Update state with data
-						this.setState({reviewsLoaded: true, data: entries, back: false});
-					});
+                    this.props.navigate('/' + id);
 				}
 				else {
 					// Invalid URL
@@ -55,40 +72,22 @@ class App extends Component {
 
 	handleOnClickRecent(id) {
 		this.setState({appID: id, validURL: true});
-
-		getIosReviews(id, (entries) => {
-			// Update state with data
-			this.setState({reviewsLoaded: true, data: entries, back: false});
-		});
+        this.props.navigate('/' + id);
 	}
 
 
-	historyBackButton(i) {
-		window.history.replaceState(null, null, '/');
-        this.setState({reviewsLoaded: false, back: true});
-	}
+
 
 	
 	render() {
-        
-        var urlParamReviewID = this.props.match.params.id;
         var reviewApp;
-        if ((typeof urlParamReviewID !== "undefined" && urlParamReviewID !== null && !this.state.reviewsLoaded && !this.state.back)) {
-            getIosReviews(urlParamReviewID, (entries) => {
-                // Update state with data
-                this.setState({reviewsLoaded: true, data: entries});
-            });
-        }
-        else if (!this.state.reviewsLoaded) {
+        if (this.props.id && this.state.reviewsLoaded) {
+            reviewApp = <ReviewsPage data={this.state.data} />;
+        } else if (this.props.id) {
+             reviewApp = <div>Loading...</div>; // Or keep generic loading state
+        } else {
             reviewApp = <Home inputURL={this.state.inputURL} onChange={(i) => this.handleChange(i)} onClick={(i) => this.handleSubmit(i)} onClickRecent={(i) => this.handleOnClickRecent(i)} />;
-		} else {
-			reviewApp = <ReviewsPage data={this.state.data} />;
-
-			// Push History State
-            var appID = this.state.appID;
-			window.history.pushState(null, null, appID);
-			window.addEventListener('popstate', this.historyBackButton);
-		}
+        }
 		
 		return (
 			<div className="App">
@@ -144,15 +143,23 @@ class Recents extends Component {
 		if ( localStorage.length !== 0 ) {
 			for(var i = 0; i < localStorage.length; i++) {
 				var key = localStorage.key(i);
-
 				var appId = key;
-				var appObj = JSON.parse(localStorage.getItem(appId));
 
-				var appIcon = appObj.icon;
-				var appName = appObj.name;
-				var appDev = appObj.dev;
+				try {
+					var appObj = JSON.parse(localStorage.getItem(appId));
 
-				recents.push(<RecentItem onClick={(i) => this.props.onClick(i)} id={appId} icon={appIcon} name={appName} dev={appDev} key={appId} />);
+					// Validate that the object has the required properties
+					if (appObj && appObj.name) {
+						var appIcon = appObj.icon;
+						var appName = appObj.name;
+						var appDev = appObj.dev;
+
+						recents.push(<RecentItem onClick={(i) => this.props.onClick(i)} id={appId} icon={appIcon} name={appName} dev={appDev} key={appId} />);
+					}
+				} catch (e) {
+					// Ignore invalid JSON or non-app items in localStorage
+					console.warn("Skipping invalid localStorage item:", key);
+				}
 			}
 		}
 
@@ -271,7 +278,7 @@ class ReviewCard extends Component {
 		}
 
 		return (
-			<div className="reviewCard" onClick="">
+			<div className="reviewCard">
 				<div className={"material-icons starRating starRating"+this.props.reviewRating}>{starRatingText}</div>
 				<p className="userName">{this.props.reviewUser}</p>
 				<h1 className="title">{this.props.reviewTitle}</h1>
@@ -292,21 +299,27 @@ function extractIosID(url, callback) {
 		parsedUrl = parsedUrl[0];
 		
 		if (parsedUrl.indexOf('apps.apple.com') !== -1) {
-			var startPosition = url.indexOf('id') + 2;
-
-			var id = url.substring(startPosition);
-
-			console.log(id);
-			callback(id);
+			var match = parsedUrl.match(/\bid(\d+)/i);
+			if (match) {
+				var id = match[1];
+				console.log(id);
+				callback(id);
+			} else {
+				// Fallback or error handling if needed, though regex should catch valid IDs
+				console.log("Could not extract ID from URL");
+				callback(0);
+			}
 		}
 		else if (parsedUrl.indexOf("appsto.re") !== -1) {
 
 			getLongUrl(parsedUrl, (longUrl) => {
-				var startPosition = longUrl.indexOf('id') + 2;
-				var endPosition = longUrl.indexOf('?');
-				var id = longUrl.substring(startPosition, endPosition);
-
-				callback(id);
+				var match = longUrl.match(/\bid(\d+)/i);
+				if (match) {
+					var id = match[1];
+					callback(id);
+				} else {
+					callback(0);
+				}
 			});
 		}
 		else {
@@ -337,20 +350,27 @@ function getLongUrl(shortUrl, callback) {
 }
 
 
+// Wrapper component to use useParams hook and pass to App
+function AppWrapper() {
+	const { id } = useParams();
+    const navigate = useNavigate();
+	return <App id={id} navigate={navigate} />;
+}
+
 function getIosReviews(id, callback) {
 	var entries = [];
 
 	for (var i = 1; i <= 10; i++) {
 		var pageUrl = "https://itunes.apple.com/us/rss/customerreviews/page=" + i + "/id=" + id.toString() + "/sortby=mostrecent/json";
 
-		const request = require("request");
-
-		request({
-			url: pageUrl,
-			json: true
-		},  (error, response, body) => {
-
-			if (!error && response.statusCode === 200) {
+		fetch(pageUrl)
+			.then(response => {
+				if (response.ok) {
+					return response.json();
+				}
+				throw new Error('Network response was not ok');
+			})
+			.then(body => {
 				var pageEntries = [];
 				var pageUrl = body.feed.id.label;
 				var feedEntries = body.feed.entry;
@@ -361,7 +381,7 @@ function getIosReviews(id, callback) {
 				}
 
 				feedEntries.forEach( (entry, index) => {
-					// if (index !== 90000) {
+					// if (index !== 0) {
 						var reviewID = entry.id.label;
 						var reviewTitle = entry.title.label;
 						var reviewRating = entry["im:rating"].label;
@@ -381,44 +401,57 @@ function getIosReviews(id, callback) {
 							}
 						);
 					// }
-					// else if (index === 90000 && pageUrl.includes("page=1/")) {
-					// 	const appIcon = entry["im:image"][2].label.replace("100x100", "512x512");
-					// 	const appName = entry["im:name"].label;
-					// 	const appDev = entry["im:artist"].label;
-
-					// 	pageEntries.push(
-					// 		{
-					// 			icon: appIcon,
-					// 			name: appName,
-					// 			dev: appDev,
-					// 		}
-					// 	);
-
-					// 	// Save into recents
-					// 	var localStrObj = {icon: appIcon, name: appName, dev: appDev};
-					// 	localStorage.setItem(id, JSON.stringify(localStrObj));
-					// }
+					if (index === 0 && (pageUrl.includes("page=1/") || pageUrl.includes("page=1?"))) {
+						// Fetch and save app details using Lookup API
+						saveAppDetails(id);
+					}
 				});
-			
+
 				// Combine array from loop to existing array containing all entries
 				Array.prototype.push.apply(entries, pageEntries);
-				
+
 				// Send data back
 				callback(entries);
-			}
-		});
+			})
+			.catch(error => {
+				console.error('Error fetching reviews:', error);
+			});
 	}
+}
+
+function saveAppDetails(id) {
+	const lookupUrl = "/lookup?id=" + id;
+	fetch(lookupUrl)
+		.then(response => {
+			if (response.ok) {
+				return response.json();
+			}
+			throw new Error('Network response was not ok');
+		})
+		.then(data => {
+			if (data.results && data.results.length > 0) {
+				const app = data.results[0];
+				const localStrObj = {
+					icon: app.artworkUrl512 || app.artworkUrl100,
+					name: app.trackName,
+					dev: app.artistName
+				};
+				localStorage.setItem(id, JSON.stringify(localStrObj));
+			}
+		})
+		.catch(error => {
+			console.error('Error fetching app details:', error);
+		});
 }
 
 
 
-ReactDOM.render((
+const root = createRoot(document.getElementById('root'));
+root.render(
     <Router>
-        <Switch>
-            <Route exact path="/" component={App} />
-            <Route path="/:id" component={App} />
-        </Switch>
+        <Routes>
+            <Route path="/" element={<AppWrapper />} />
+            <Route path="/:id" element={<AppWrapper />} />
+        </Routes>
     </Router>
-    
-    
-), document.getElementById('root'));
+);

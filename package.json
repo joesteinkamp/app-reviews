@@ -2,16 +2,15 @@
   "name": "app-reviews",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://itunes.apple.com",
   "dependencies": {
-    "express": "^4.15.4",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "react-router": "^4.3.1",
-    "react-router-dom": "^4.1.2",
-    "request": "^2.81.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
-    "react-scripts": "^2.1.8"
+    "http-proxy-middleware": "^3.0.5",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -24,5 +23,11 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "overrides": {
+    "eslint": "^8.57.1",
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.49",
+    "webpack-dev-server": "^4.15.2"
+  }
 }
