@@ -291,7 +291,7 @@ function extractIosID(url, callback) {
 	if ((typeof parsedUrl !== "undefined" && parsedUrl !== null) ) {
 		parsedUrl = parsedUrl[0];
 		
-		if (parsedUrl.indexOf('itunes.apple.com') !== -1) {
+		if (parsedUrl.indexOf('apps.apple.com') !== -1) {
 			var startPosition = url.indexOf('id') + 2;
 
 			var id = url.substring(startPosition);
