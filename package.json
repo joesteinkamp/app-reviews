@@ -2,7 +2,6 @@
   "name": "app-reviews",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://itunes.apple.com",
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

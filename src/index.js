@@ -420,28 +420,32 @@ function getIosReviews(id, callback) {
 }
 
 function saveAppDetails(id) {
-	const lookupUrl = "/lookup?id=" + id;
-	fetch(lookupUrl)
-		.then(response => {
-			if (response.ok) {
-				return response.json();
-			}
-			throw new Error('Network response was not ok');
-		})
-		.then(data => {
-			if (data.results && data.results.length > 0) {
-				const app = data.results[0];
-				const localStrObj = {
-					icon: app.artworkUrl512 || app.artworkUrl100,
-					name: app.trackName,
-					dev: app.artistName
-				};
-				localStorage.setItem(id, JSON.stringify(localStrObj));
-			}
-		})
-		.catch(error => {
-			console.error('Error fetching app details:', error);
-		});
+	const lookupUrl = "https://itunes.apple.com/lookup?id=" + id;
+    
+    fetchJSONP(lookupUrl, (data) => {
+        if (data.results && data.results.length > 0) {
+            const app = data.results[0];
+            const localStrObj = {
+                icon: app.artworkUrl512 || app.artworkUrl100,
+                name: app.trackName,
+                dev: app.artistName
+            };
+            localStorage.setItem(id, JSON.stringify(localStrObj));
+        }
+    });
+}
+
+function fetchJSONP(url, callback) {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        callback(data);
+    };
+
+    const script = document.createElement('script');
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+    document.body.appendChild(script);
 }
 
 
